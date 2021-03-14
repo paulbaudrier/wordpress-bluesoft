@@ -1,0 +1,55 @@
+version: "3"
+services:
+
+  ### TRAEFIK PROXY ###
+  traefik:
+    image: "traefik:v2.4"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - /proxy/traefik.toml:/traefik.toml
+      - /proxy/acme.json:/acme.json
+
+ ### MARIADB DATABASE CONTAINER ###
+  db:
+    image: mariadb
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+### WORDPRESS CONTAINEUR ###
+  wordpress:
+    depends_on:
+      - db
+      - traefik
+    image: wordpress:latest
+    ports:
+      - "8000:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress:/var/html/www 
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wordpress.rule=Host(`wordpress.localhost`)"
+      - "traefik.http.routers.wordpress.entrypoints=http"
+
+volumes:
+  db_data: {}
+  wordpress: {}
