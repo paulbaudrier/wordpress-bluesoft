@@ -14,8 +14,8 @@ services:
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - /proxy/traefik.toml:/traefik.toml
-      - /proxy/acme.json:/acme.json
+      - /proxy/traefik.toml:/etc/traefik/traefik.toml
+      - /proxy/acme.json:/etc/traefik/acme.json
 
  ### MARIADB DATABASE CONTAINER ###
   db:
@@ -24,10 +24,10 @@ services:
       - db_data:/var/lib/mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root-password
-      MYSQL_DATABASE: wpdb
-      MYSQL_USER: wpuser
-      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_USER: $MYSQL_USER
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
 
 ### WORDPRESS CONTAINEUR ###
   wordpress:
@@ -40,14 +40,14 @@ services:
     restart: always
     environment:
       WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_USER: wpuser
-      WORDPRESS_DB_PASSWORD: password
-      WORDPRESS_DB_NAME: wpdb
+      WORDPRESS_DB_USER: $MYSQL_USER
+      WORDPRESS_DB_PASSWORD: $MYSQL_PASSWORD
+      WORDPRESS_DB_NAME: $MYSQL_DATABASE
     volumes:
       - wordpress:/var/html/www 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.wordpress.rule=Host(`wordpress.localhost`)"
+      - "traefik.http.routers.wordpress.rule=Host(`boutique01.macloudcompany.com`)"
       - "traefik.http.routers.wordpress.entrypoints=http"
 
 volumes:
