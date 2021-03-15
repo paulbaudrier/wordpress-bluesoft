@@ -1,0 +1,15 @@
+http:
+  routers:
+    traefik:
+      rule: "Host(`traefik.docker.localhost`)"
+      service: "api@internal"
+      tls:
+        domains:
+          - main: "boutique01.macloudcompany.com"
+            sans:
+              - "*.boutique01.macloudcompany.com"
+
+tls:
+  certificates:
+    - certFile: "/etc/certs/star.macloudcompany.com_2021.fullchain.pem"
+      keyFile: "/etc/certs/star_macloudcompany_com.key"

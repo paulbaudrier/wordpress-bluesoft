@@ -14,8 +14,12 @@ services:
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - /proxy/traefik.toml:/etc/traefik/traefik.toml
-      - /proxy/acme.json:/etc/traefik/acme.json
+      # Map the static conf into the container
+      - ./proxy/traefik.yml:/etc/traefik/traefik.yml:ro
+      # Map the dynamic conf into the container
+      - ./proxy/config.yml:/etc/traefik/config.yml:ro
+      # Map the certificats into the container
+      - ./proxy/certs:/etc/certs:ro
 
  ### MARIADB DATABASE CONTAINER ###
   db:
@@ -36,7 +40,7 @@ services:
       - traefik
     image: wordpress:latest
     ports:
-      - "8000:80"
+      - "8081:80"
     restart: always
     environment:
       WORDPRESS_DB_HOST: db:3306
