@@ -51,8 +51,10 @@ services:
       - wordpress:/var/html/www 
     labels:
       - "traefik.enable=true"
+      # URL to reach this container
       - "traefik.http.routers.wordpress.rule=Host(`boutique01.macloudcompany.com`)"
-      - "traefik.http.routers.wordpress.entrypoints=http"
+      # Activation of TLS
+      - "traefik.http.routers.wordpress.tls=true"
 
 volumes:
   db_data: {}
